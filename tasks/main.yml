@@ -1,0 +1,32 @@
+---
+# tasks file for redisinstall
+#Redis Installation
+# tasks file for redisinstall
+   - name: Install all packages
+     yum: name={{item}} state=present update_cache=yes
+     with_items:
+       - gcc  
+       - make
+       - tcl
+       - firewalld
+       - wget
+       
+   - get_url: url=http://download.redis.io/releases/redis-3.2.3.tar.gz dest=/opt/
+   
+   - name: ansible create directory /etc/redis
+     file: path=/etc/redis/ state=directory mode=0755
+   - name: ansible create directory /var/redis
+     file: path=/var/redis/ state=directory mode=0755
+   - name: ansible create directory /var/redis/7000
+     file: path=/var/redis/7000 state=directory mode=0755	      
+   - name: Copy redis conf in /etc/redis
+     copy: src=./../files/7000.conf dest=/etc/redis/7000.conf         	 
+   - name: Copy sentinel conf in /etc/redis   
+     copy: src=./../files/sentinel.conf dest=/etc/redis/sentinel.conf    	 
+   - name: Copy script to /home
+     copy: src=./../files/redisinstall.sh dest=/home/     	   
+   - name: setting permission
+     shell: chmod 755 /etc/redis/7000.conf; chmod 755 /home/redisinstall.sh; chmod 755 /etc/redis/sentinel.conf
+   - name: executing the script on remote machine
+     shell: sh /home/redisinstall.sh {{ ip1 }} {{ ip2 }} {{ ip3 }} {{ id1 }} {{ id2 }} {{ id3 }}
+     ignore_errors: yes
