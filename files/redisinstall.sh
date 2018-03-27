@@ -81,5 +81,7 @@ sudo sed -i 's/sentinel monitor cache.*/sentinel monitor cache '$ip1' 7000 2/' /
 /etc/init.d/redis_7000 start
 /etc/init.d/redis_7000 stop
 
+/etc/init.d/redis-sentinel start
+/etc/init.d/redis_7000 start
 
 
