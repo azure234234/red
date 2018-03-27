@@ -24,13 +24,9 @@
    - name: Copy sentinel conf in /etc/redis   
      copy: src=./../files/sentinel.conf dest=/etc/redis/sentinel.conf    	 
    - name: Copy script to /home
-     copy: src=./../files/redisinstall.sh dest=/home/
-   - name: Copy redis_7000 in /etc/init.d/   
-     copy: src=./../files/redis_7000 dest=/etc/init.d/
-   - name: Copy redis-sentinel in /etc/init.d   
-     copy: src=./../files/redis-sentinel dest=/etc/init.d/     	   
+     copy: src=./../files/redisinstall.sh dest=/home/     	   
    - name: setting permission
-     shell: chmod 755 /etc/redis/7000.conf; chmod 755 /home/redisinstall.sh; chmod 755 /etc/redis/sentinel.conf; chmod 755 /home/redisconfig.sh; chmod 755 /etc/init.d/redis_7000; chmod 755 /etc/init.d/redis-sentinel
-   - name: executing the install script on remote machine
+     shell: chmod 755 /etc/redis/7000.conf; chmod 755 /home/redisinstall.sh; chmod 755 /etc/redis/sentinel.conf
+   - name: executing the script on remote machine
      shell: sh /home/redisinstall.sh {{ ip1 }} {{ ip2 }} {{ ip3 }} {{ id1 }} {{ id2 }} {{ id3 }}
      ignore_errors: yes

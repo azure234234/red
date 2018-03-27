@@ -1,0 +1,62 @@
+#!/bin/sh
+#
+# Simple Sentinel init.d script conceived to work on Linux systems
+# as it does use of the /proc filesystem.
+
+SENTINELPORT=26379
+EXEC=/usr/local/bin/redis-sentinel
+CLIEXEC=/usr/local/bin/redis-cli
+
+#PIDFILE=/var/run/sentinel_${SENTINELPORT}.pid
+PIDFILE=/var/run/redis-sentinel.pid
+CONF="/etc/redis/sentinel.conf"
+
+###############
+# SysV Init Information
+# chkconfig: - 58 74
+# description: sentinel is the sentinel daemon.
+### BEGIN INIT INFO
+# Provides: sentinel
+# Required-Start: $network $local_fs $remote_fs
+# Required-Stop: $network $local_fs $remote_fs
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Should-Start: $syslog $named
+# Should-Stop: $syslog $named
+# Short-Description: start and stop sentinel
+# Description: Sentinel daemon
+### END INIT INFO
+
+
+case "$1" in
+    start)
+        if [ -f $PIDFILE ]
+        then
+                echo "$PIDFILE exists, process is already running or crashed"
+        else
+                echo "Starting Sentinel server..."
+                nohup $EXEC $CONF >> /var/log/redis-sentinel.log 2>&1 &
+                echo $! > "${PIDFILE}";
+        fi
+        ;;
+    stop)
+        if [ ! -f $PIDFILE ]
+        then
+                echo "$PIDFILE does not exist, process is not running"
+        else
+                PID=$(cat $PIDFILE)
+                echo "Stopping ..."
+                $CLIEXEC -p $SENTINELPORT shutdown
+                while [ -x /proc/${PID} ]
+                do
+                    echo "Waiting for Sentinel to shutdown ..."
+                    sleep 1
+                done
+                rm -rf $PIDFILE
+                echo "Sentinel stopped"
+        fi
+        ;;
+    *)
+        echo "Please use start or stop as first argument"
+        ;;
+esac
